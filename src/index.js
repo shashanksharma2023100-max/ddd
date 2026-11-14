@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const { Client, GatewayIntentBits, ChannelType } = require('discord.js');
+const http = require('node:http');
 const {
   joinVoiceChannel,
   getVoiceConnection,
@@ -19,6 +20,29 @@ for (const [name, value] of Object.entries({ DISCORD_TOKEN, GUILD_ID, VOICE_CHAN
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
 });
+
+// Render Web Services require an HTTP listener on PORT, even though the bot
+// itself communicates with Discord over its gateway and voice connections.
+const port = Number(process.env.PORT || 3000);
+const server = http.createServer((request, response) => {
+  if (request.url === '/health' && request.method === 'GET') {
+    response.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    response.end(JSON.stringify({
+      status: 'ok',
+      discord: client.isReady() ? 'connected' : 'connecting',
+      voice: getVoiceConnection(GUILD_ID)?.state.status ?? 'disconnected',
+    }));
+    return;
+  }
+
+  response.writeHead(200, { 'content-type': 'text/plain; charset=utf-8' });
+  response.end('Discord voice bot is running. Health: /health\n');
+});
+
+server.listen(port, '0.0.0.0', () => {
+  console.log(`HTTP health server listening on port ${port}.`);
+});
+server.on('error', (error) => console.error('HTTP server error:', error));
 
 let retryTimer;
 let retryDelay = 5_000;
@@ -86,7 +110,7 @@ async function maintainConnection() {
   console.log(`Joining ${channel.name} in ${channel.guild.name}...`);
 }
 
-client.once('ready', () => {
+client.once('clientReady', () => {
   console.log(`Logged in as ${client.user.tag}.`);
   maintainConnection().catch((error) => {
     console.error('Could not join the configured voice channel:', error);
@@ -102,6 +126,7 @@ async function shutdown(signal) {
   console.log(`Received ${signal}; disconnecting.`);
   if (retryTimer) clearTimeout(retryTimer);
   getVoiceConnection(GUILD_ID)?.destroy();
+  server.close();
   client.destroy();
   process.exit(0);
 }

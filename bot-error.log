@@ -1,2 +1,19 @@
 (node:21420) DeprecationWarning: The ready event has been renamed to clientReady to distinguish it from the gateway READY event and will only emit under that name in v15. Please use clientReady instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
+C:\Users\Shashank Sharma\Documents\ChatGPT\bot\node_modules\@discordjs\voice\dist\index.js:1099
+      this.socket.once("close", () => reject(new Error("Cannot perform IP discovery - socket closed")));
+                                             ^
+
+Error: Cannot perform IP discovery - socket closed
+    at Socket.<anonymous> (C:\Users\Shashank Sharma\Documents\ChatGPT\bot\node_modules\@discordjs\voice\dist\index.js:1099:46)
+    at Socket.wrapper (node:events:639:12)
+    at Socket.emit (node:events:526:24)
+    at socketCloseNT (node:dgram:929:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+Emitted 'error' event on VoiceConnection instance at:
+    at VoiceConnection.onNetworkingError (C:\Users\Shashank Sharma\Documents\ChatGPT\bot\node_modules\@discordjs\voice\dist\index.js:2448:10)
+    at Networking.emit (node:events:514:28)
+    at C:\Users\Shashank Sharma\Documents\ChatGPT\bot\node_modules\@discordjs\voice\dist\index.js:1565:32
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.22.1

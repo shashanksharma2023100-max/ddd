@@ -1,6 +1,6 @@
 # Discord voice channel stayer
 
-A quiet Discord bot that joins one configured voice channel, stays self-muted and self-deafened, and tries to reconnect if the voice connection drops.
+A quiet Discord bot that joins one configured voice channel, stays self-muted and self-deafened, and tries to reconnect if the voice connection drops. It also serves a small HTTP health endpoint so it can run as a Render Web Service.
 
 ## Setup
 
@@ -15,5 +15,7 @@ A quiet Discord bot that joins one configured voice channel, stays self-muted an
    ```
 
 Keep the process running on a computer or server to keep the bot online. Restart it with a process manager if you want it to come back after a machine reboot. The bot can only stay connected while Discord and the host are reachable and it has permission to join.
+
+The HTTP server binds to `0.0.0.0` on the `PORT` environment variable (or port `3000` locally). `GET /health` returns a JSON status for the HTTP process, Discord login, and voice connection.
 
 Never share the bot token or commit `.env`.
